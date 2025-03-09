@@ -41,10 +41,98 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
 download.file(url, destfile = "dataset.zip")
+time_stamp <- Sys.time()
 unzip("dataset.zip")
+formatted_time <- format(time_stamp, "%Y-%m-%d %H:%M:%S")
+write(x = formatted_time, file = "The time stamp for dataset download.txt")
+```
+### Load Libraries
+```{r}
+# Initialize
+# Function to check, install, and load a package
+install_and_load <- function(package_name) {
+  if (!requireNamespace(package_name, quietly = TRUE)) {
+    install.packages(package_name, dependencies = TRUE)
+    message(paste("Package", package_name, "installed"))
+  }
+  suppressMessages(library(package_name, character.only = TRUE))
+  message(paste("Package", package_name, "loaded"))
+}
+
+# Execution
+install_and_load("readr")
 ```
 
-### Load to R
+### Explore loading data to R
+```{r}
+file <- "UCI HAR Dataset/test/subject_test.txt"
+test_subject <- read_csv(file = file, col_names = FALSE, show_col_types = FALSE)
+```
+
+### Group load data to R
 ```{r}
 
+(function(){
+# List all .txt files in the test directory (full path provided)
+txt_files <- list.files("UCI HAR Dataset/test", pattern = "\\.txt$", full.names = TRUE)
+
+# Loop through each file
+for (file in txt_files) {
+  # Extract file name without the directory and extension
+  file_name <- tools::file_path_sans_ext(basename(file))
+  
+  # Read the file; adjust header and other parameters according to your file format
+  data <- read_csv(file, col_names = FALSE, show_col_types = FALSE)
+  
+  # Assign the data to an object with the same name as the file (without .txt)
+  assign(file_name, data, envir = .GlobalEnv)
+}
+})()
+
+(function(){
+# List all .txt files in the train directory (full path provided)
+txt_files <- list.files("UCI HAR Dataset/train", pattern = "\\.txt$", full.names = TRUE)
+
+# Loop through each file
+for (file in txt_files) {
+  # Extract file name without the directory and extension
+  file_name <- tools::file_path_sans_ext(basename(file))
+  
+  # Read the file; adjust header and other parameters according to your file format
+  data <- read_csv(file, col_names = FALSE, show_col_types = FALSE)
+  
+  # Assign the data to an object with the same name as the file (without .txt)
+  assign(file_name, data, envir = .GlobalEnv)
+}
+})()
 ```
+
+## Parsing the X_data
+```{r}
+test_x_list <- apply(X = X_test, MARGIN = 1, FUN = function(line) {
+  # Ensure the row is a character string
+  line <- as.character(line)
+  
+  # Determine the total number of characters in the line
+  total_chars <- nchar(line)
+  
+  # Calculate the number of fields.
+  # Each field uses 15 characters, plus a space delimiter (16 chars total) except the last field.
+  # So, number of fields = floor((total_chars + 1) / 16)
+  n_fields <- floor((total_chars + 1) / 16)
+  
+  # Create starting indices for each field: 1, 17, 33, etc.
+  starts <- seq(from = 1, by = 16, length.out = n_fields)
+  
+  # Extract each field as a 15-character substring and trim any extra spaces
+  fields <- sapply(starts, function(i) {
+    field <- substring(line, i, i + 14)
+    trimws(field)
+  })
+  
+  # Convert the extracted strings to numeric
+  as.numeric(fields)
+})
+```
+
+
