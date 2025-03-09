@@ -60,15 +60,8 @@ install_and_load <- function(package_name) {
 }
 
 # Execution
-install_and_load("readr")
+# install_and_load("readr")
 ```
-
-### Explore loading data to R
-```{r}
-file <- "UCI HAR Dataset/test/subject_test.txt"
-test_subject <- read_csv(file = file, col_names = FALSE, show_col_types = FALSE)
-```
-
 ### Group load data to R
 ```{r}
 
@@ -82,7 +75,7 @@ for (file in txt_files) {
   file_name <- tools::file_path_sans_ext(basename(file))
   
   # Read the file; adjust header and other parameters according to your file format
-  data <- read_csv(file, col_names = FALSE, show_col_types = FALSE)
+  data <- read.csv(file, header = FALSE)
   
   # Assign the data to an object with the same name as the file (without .txt)
   assign(file_name, data, envir = .GlobalEnv)
@@ -99,7 +92,7 @@ for (file in txt_files) {
   file_name <- tools::file_path_sans_ext(basename(file))
   
   # Read the file; adjust header and other parameters according to your file format
-  data <- read_csv(file, col_names = FALSE, show_col_types = FALSE)
+  data <- read.csv(file, header = FALSE)
   
   # Assign the data to an object with the same name as the file (without .txt)
   assign(file_name, data, envir = .GlobalEnv)
@@ -107,32 +100,23 @@ for (file in txt_files) {
 })()
 ```
 
-## Parsing the X_data
+## Parsing the X_test
 ```{r}
-test_x_list <- apply(X = X_test, MARGIN = 1, FUN = function(line) {
-  # Ensure the row is a character string
-  line <- as.character(line)
-  
-  # Determine the total number of characters in the line
-  total_chars <- nchar(line)
-  
-  # Calculate the number of fields.
-  # Each field uses 15 characters, plus a space delimiter (16 chars total) except the last field.
-  # So, number of fields = floor((total_chars + 1) / 16)
-  n_fields <- floor((total_chars + 1) / 16)
-  
-  # Create starting indices for each field: 1, 17, 33, etc.
-  starts <- seq(from = 1, by = 16, length.out = n_fields)
-  
-  # Extract each field as a 15-character substring and trim any extra spaces
-  fields <- sapply(starts, function(i) {
-    field <- substring(line, i, i + 14)
-    trimws(field)
-  })
-  
-  # Convert the extracted strings to numeric
-  as.numeric(fields)
-})
+# Construct the widths vector:
+# - Skip the leading space (-1)
+# - For the first 560 numbers, read 16 characters then skip 1 (16, -1 repeated)
+# - Finally, read the last number (16)
+widths <- c(-1, rep(c(16, -1), 560), 16)
+
+# Open a text connection to the column in X_test (assuming the column is the first one)
+con <- textConnection(X_test[[1]])
+
+# Read the fixed-width formatted data into a data frame.
+fwf_data <- read.fwf(con, widths = widths, strip.white = TRUE)
+close(con)
+
+# Convert each row of fwf_data into a numeric vector and store in a list.
+test_x_list <- lapply(seq_len(nrow(fwf_data)), function(i) as.numeric(fwf_data[i,]))
 ```
 
 
