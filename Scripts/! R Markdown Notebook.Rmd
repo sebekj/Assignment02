@@ -61,6 +61,7 @@ install_and_load <- function(package_name) {
 
 # Execution
 # install_and_load("readr")
+# install_and_load("dplyr")
 ```
 ### Group load data to R
 ```{r}
@@ -100,23 +101,46 @@ for (file in txt_files) {
 })()
 ```
 
+## Loead the Features (Variable Names), Activity Labels
+```{r}
+features <- read.table(file = "UCI HAR Dataset/features.txt")
+activity_labels <- read.table(file = "UCI HAR Dataset/activity_labels.txt")
+```
+
 ## Parsing the X_test
 ```{r}
-# Construct the widths vector:
-# - Skip the leading space (-1)
-# - For the first 560 numbers, read 16 characters then skip 1 (16, -1 repeated)
-# - Finally, read the last number (16)
-widths <- c(-1, rep(c(16, -1), 560), 16)
+# Parsing each line at every single space
+test_x_parsed <- lapply(X_test[1], function(x){
+  strsplit(trimws(x), "\\s+")
+})
 
-# Open a text connection to the column in X_test (assuming the column is the first one)
-con <- textConnection(X_test[[1]])
+# Bumping up objects by one level (name of column)
+test_x_parsed <- test_x_parsed[[1]] 
 
-# Read the fixed-width formatted data into a data frame.
-fwf_data <- read.fwf(con, widths = widths, strip.white = TRUE)
-close(con)
+# Converting to numeric, expecting 1000 original lines of data
+test_x_parsed <- lapply(test_x_parsed[1:length(test_x_parsed)], as.numeric)
 
-# Convert each row of fwf_data into a numeric vector and store in a list.
-test_x_list <- lapply(seq_len(nrow(fwf_data)), function(i) as.numeric(fwf_data[i,]))
+# Converting to a data frame (expecting 561 columns)
+# x <- as.data.frame(test_x_parsed)
+# names(x) <- c(1:length(features[,2])) # Features do not seem to be unique
+```
+
+## Parsing the X_train
+```{r}
+# Parsing each line at every single space
+train_x_parsed <- lapply(X_train[1], function(x){
+  strsplit(trimws(x), "\\s+")
+})
+
+# Bumping up objects by one level (name of column)
+train_x_parsed <- train_x_parsed[[1]] 
+
+# Converting to numeric, expecting 1000 original lines of data
+train_x_parsed <- lapply(train_x_parsed[1:length(train_x_parsed)], as.numeric)
+
+# Converting to a data frame (expecting 561 columns)
+# x2 <- as.data.frame(train_x_parsed)
+# names(x2) <- c(1:length(features[,2])) # Features do not seem to be unique
 ```
 
 
