@@ -240,5 +240,5 @@ head(tidy_data)
 ## Save the tidy data set
 
 ```{r}
-write.csv(x = tidy_data, file = "tidy_data.csv", row.names = FALSE)
+write.csv(x = tidy_data, file = "tidy_data.txt", row.names = FALSE)
 ```
