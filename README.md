@@ -8,3 +8,6 @@ In this assignment, I used this dataset: Davide Anguita, Alessandro Ghio, Luca O
 - "tidy_data.csv" - This is the tidy data set which is the result of the assignment.
 - "CodeBook.md" - This is the code book required in the assignment. This describes the variables, the data, and any transformations or work that I performed to clean up the data.
 - "README.md" - This file which is required in the assignment.
+
+# How to Run the code
+I suggest to run the "CodeBook.Rmd" file from RStudio. The "CodeBook.md" will not execute correctly if you use the 'Run all' command.
