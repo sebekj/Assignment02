@@ -38,6 +38,7 @@ knitr::opts_chunk$set(echo = TRUE)
 6.  From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
 ## Download data set, unzip, root directory
+
 ```{r}
 url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
 download.file(url, destfile = "dataset.zip")
@@ -46,7 +47,9 @@ unzip("dataset.zip")
 formatted_time <- format(time_stamp, "%Y-%m-%d %H:%M:%S")
 write(x = formatted_time, file = "The time stamp for dataset download.txt")
 ```
+
 ## Load Libraries
+
 ```{r}
 # Initialize
 # Function to check, install, and load a package
@@ -64,7 +67,8 @@ install_and_load <- function(package_name) {
 install_and_load("dplyr")
 ```
 
-## Group load data to R
+## Group-load data to R
+
 ```{r}
 
 (function(){
@@ -102,13 +106,15 @@ for (file in txt_files) {
 })()
 ```
 
-## Load the Features (Variable Names), Activity Labels
+## Load Features (Variable Names), Activity Labels
+
 ```{r}
 features <- read.table(file = "UCI HAR Dataset/features.txt")
 activity_labels <- read.table(file = "UCI HAR Dataset/activity_labels.txt")
 ```
 
 ## Parsing the X_test
+
 ```{r}
 # Parsing each line at every single space
 test_x_parsed <- lapply(X_test[1], function(x){
@@ -123,6 +129,7 @@ test_x_parsed <- lapply(test_x_parsed[1:length(test_x_parsed)], as.numeric)
 ```
 
 ## Parsing the X_train
+
 ```{r}
 # Parsing each line at every single space
 train_x_parsed <- lapply(X_train[1], function(x){
@@ -137,17 +144,20 @@ train_x_parsed <- lapply(train_x_parsed[1:length(train_x_parsed)], as.numeric)
 ```
 
 ## ASSIGNMENT 1: Merge Test and Train data to create one data set; TEST FIRST
+
 ```{r}
 merged_list <- c(test_x_parsed, train_x_parsed)
 ```
 
-## Convert to dataframe
+## Convert to data.frame
+
 ```{r}
 merged_df <- as.data.frame(do.call(rbind, merged_list))
 # colnames(merged_df) <- c(...) # Add feature/variable names
 ```
 
 ## ASSIGNMENT 2: Extract summary statistics for each feature
+
 ```{r}
 summary <- cbind(mean = apply(X = merged_df, MARGIN = 2, FUN = mean), sd = apply(X = merged_df, MARGIN = 2, FUN = sd))
 
@@ -156,8 +166,10 @@ summary <- data.frame(summary)
 summary <- cbind(feature = features[,2], summary)
 ```
 
-##  ASSIGNMENT 3: Use descriptive activity names to name activities
+## ASSIGNMENT 3: Use descriptive activity names to name activities
+
 ### Tidy activity labels
+
 ```{r}
 activity_labels[,2] <- as.factor(activity_labels[,2])
 names(activity_labels) <- c("key", "activity")
@@ -173,18 +185,23 @@ merged_train_labels <- merge(y_train, activity_labels[, c("key", "activity")], b
 # Combine test and train data labels, TEST DATA FIRST
 merged_labels <- rbind(merged_test_labels, merged_train_labels)
 ```
-### Merge keys for subject, TEST SUBJECT FIRST
+
+### Merge keys for subjects, TEST SUBJECT FIRST
+
 ```{r}
 merged_subject <- c(subject_test[,1], subject_train[,1])
 ```
 
 ### Merge all data with activity labels and subjects' keys
+
 ```{r}
 merged_df_all <- cbind(merged_df, merged_labels, subject = merged_subject)
 ```
 
 ## ASSIGNMENT 4: Label data with descriptive variable names
+
 ### Tidy feature names
+
 ```{r}
 # Default replacements, retain readability
 variables <- make.names(names = features[,2], unique = TRUE)
@@ -204,11 +221,13 @@ length(unique(variables)) # Check whether all names are unique
 ```
 
 ### Add unique column names/variable names/features to data
+
 ```{r}
 names(merged_df_all) <- c(variables, c("key", "activity", "subject"))
 ```
 
 ## ASSIGNMENT 5: From data in 4, create a second, independent tidy data set with the average of each variable for each activity and each subject
+
 ```{r}
 # Using dplyr
 tidy_data <- merged_df_all %>%
@@ -218,7 +237,8 @@ tidy_data <- merged_df_all %>%
 head(tidy_data)
 ```
 
-## Save the tidy dataset
+## Save the tidy data set
+
 ```{r}
 write.csv(x = tidy_data, file = "tidy_data.csv", row.names = FALSE)
 ```
