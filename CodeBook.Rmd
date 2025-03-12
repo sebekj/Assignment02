@@ -70,7 +70,6 @@ install_and_load("dplyr")
 ## Group-load data to R
 
 ```{r}
-
 (function(){
 # List all .txt files in the test directory (full path provided)
 txt_files <- list.files("UCI HAR Dataset/test", pattern = "\\.txt$", full.names = TRUE)
