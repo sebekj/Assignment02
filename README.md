@@ -7,6 +7,7 @@ In this assignment, I used this dataset: Davide Anguita, Alessandro Ghio, Luca O
 # This repository includes the following files
 - "tidy_data.txt" - This is the tidy data set which is the result of the assignment.
 - "CodeBook.md" - This is the code book required in the assignment. This describes the variables, the data, and any transformations or work that I performed to clean up the data.
+- "run_analysis.R" - This is the code to run the required analysis and produce the 'tidy_data.txt' file.
 - "README.md" - This file which is required in the assignment.
 
 # How to run the code
