@@ -170,19 +170,19 @@ summary <- cbind(feature = features[,2], summary)
 ### Tidy activity labels
 
 ```{r}
-activity_labels[,2] <- as.factor(activity_labels[,2])
+# activity_labels[,2] <- as.factor(activity_labels[,2])
 names(activity_labels) <- c("key", "activity")
 
 # Merge test data with labels
 names(y_test) <- "key"
-merged_test_labels <- merge(y_test, activity_labels[, c("key", "activity")], by = "key", all.x = TRUE)
+y_test_labels <- merge(y_test, activity_labels[, c("key", "activity")], by = "key", all.x = TRUE)
 
 # Merge train data with labels
 names(y_train) <- "key"
-merged_train_labels <- merge(y_train, activity_labels[, c("key", "activity")], by = "key", all.x = TRUE)
+y_train_labels <- merge(y_train, activity_labels[, c("key", "activity")], by = "key", all.x = TRUE)
 
 # Combine test and train data labels, TEST DATA FIRST
-merged_labels <- rbind(merged_test_labels, merged_train_labels)
+merged_activity <- rbind(y_test_labels, y_train_labels)
 ```
 
 ### Merge keys for subjects, TEST SUBJECT FIRST
@@ -194,7 +194,7 @@ merged_subject <- c(subject_test[,1], subject_train[,1])
 ### Merge all data with activity labels and subjects' keys
 
 ```{r}
-merged_df_all <- cbind(merged_df, merged_labels, subject = merged_subject)
+merged_df_all <- cbind(merged_df, merged_activity, subject = merged_subject)
 ```
 
 ## ASSIGNMENT 4: Label data with descriptive variable names
